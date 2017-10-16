@@ -10,7 +10,7 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class WikiFilesServer extends Service {
     MyHTTPD server;
-    int PORT = 8056;
+    static int PORT = 8056;
     public WikiFilesServer() {
         try {
             server = new MyHTTPD();

@@ -10,18 +10,25 @@
         android:layout_height="wrap_content"
         android:paddingBottom="40dp"
         />
+
     <TextView
         android:id="@+id/hello"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="hello"
-        />
+        android:text="hello" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/serveripaddr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="IP address of server" />
+
+    <Button
+        android:id="@+id/connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="requestServer"
+        android:text="Connect to Server" />
 </LinearLayout>
