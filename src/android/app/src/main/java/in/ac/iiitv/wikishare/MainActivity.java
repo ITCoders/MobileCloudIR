@@ -49,19 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-
-
-//        try {
-//            server = new MyHTTPD();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
     public void requestServer(View view) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = mServerAddress.getText().toString();
