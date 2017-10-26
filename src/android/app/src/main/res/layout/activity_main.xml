@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -9,7 +9,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="40dp"
-        />
+        android:layout_marginTop="132dp"
+        android:layout_below="@+id/hello"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/hello"
@@ -23,12 +25,17 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="IP address of server"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="60dp" />
 
     <Button
         android:id="@+id/connect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="requestServer"
-        android:text="Connect to Server" />
-</LinearLayout>
+        android:text="Connect to Server"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>
