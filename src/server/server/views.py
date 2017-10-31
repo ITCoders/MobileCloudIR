@@ -1,11 +1,14 @@
 import json
 import os
+import requests
 from django.db import IntegrityError
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import render
 from django.utils.encoding import smart_str
-
+import subprocess
 from .models import OnlineDevices, DataRepository
+from CentralServer import settings
+from django.views.decorators.csrf import csrf_exempt
 
 
 def ping(request):
@@ -46,3 +49,22 @@ def data_distribute(request):
         response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(
             os.path.basename(data_points[0].data_path))
         return response
+
+def run_multicast_listener(request):
+    subprocess.Popen(["python3", os.path.join(settings.BASE_DIR, 'server/reciever.py')])
+    return HttpResponse("ok")
+
+@csrf_exempt
+def query(request):
+    if request.method == "POST":
+        print(request.POST.get('query'))
+        res = []
+        for od in OnlineDevices.objects.all():
+            try:
+                r = requests.get("http://" + od.ip + ":8056/" + "?q=" + request.POST.get('query'))
+                print(r.text)
+                res.append({'ip': od.ip, 'sum': json.loads(r.text)['sum']})
+            except Exception as e:
+                print("error: ", e)
+        print(res)
+        return HttpResponse(json.dumps(res))
