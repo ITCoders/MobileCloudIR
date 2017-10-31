@@ -1,5 +1,6 @@
 import json
 import os
+import requests
 from django.db import IntegrityError
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import render
@@ -57,4 +58,13 @@ def run_multicast_listener(request):
 def query(request):
     if request.method == "POST":
         print(request.POST.get('query'))
-        return HttpResponse(json.dumps({'result': 'ok'}))
+        res = []
+        for od in OnlineDevices.objects.all():
+            try:
+                r = requests.get("http://" + od.ip + ":8056/" + "?q=" + request.POST.get('query'))
+                print(r.text)
+                res.append({'ip': od.ip, 'sum': json.loads(r.text)['sum']})
+            except Exception as e:
+                print("error: ", e)
+        print(res)
+        return HttpResponse(json.dumps(res))
