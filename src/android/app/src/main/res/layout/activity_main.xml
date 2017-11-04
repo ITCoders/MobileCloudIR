@@ -23,34 +23,15 @@
         android:id="@+id/query"
         android:hint="Type the query"
         />
+
     <Button
+        android:id="@+id/query_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/query"
         android:layout_centerHorizontal="true"
         android:text="Search"
-        android:id="@+id/query_result"
-        />
-
-    <EditText
-        android:id="@+id/serveripaddr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="IP address of server"
-        android:inputType="textPersonName"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="60dp" />
-
-    <Button
-        android:id="@+id/connect"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="requestServer"
-        android:text="Connect to Server"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/response"

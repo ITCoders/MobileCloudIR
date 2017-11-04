@@ -1,8 +1,10 @@
 package in.ac.iiitv.wikishare;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -19,9 +21,11 @@ import java.util.Map;
 import fi.iki.elonen.NanoHTTPD;
 
 public class WikiFilesServer extends Service {
+    Context c;
     MyHTTPD server;
     static int PORT = 8056;
     public WikiFilesServer() {
+        c = this;
         try {
             server = new MyHTTPD();
         } catch (IOException e) {
@@ -34,19 +38,25 @@ public class WikiFilesServer extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     class MyHTTPD extends NanoHTTPD {
-
         MyHTTPD() throws IOException {
             super(PORT);
             start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
-            }
-
+        }
+        private void sendMessageToActivity(String ipAddress) {
+            Intent intent = new Intent("IPofServer");
+            // You can also include some extra data.
+            intent.putExtra("ipaddr", ipAddress);
+            LocalBroadcastManager.getInstance(c).sendBroadcast(intent);
+        }
         @Override
         public Response serve(IHTTPSession session) {
-            String msg="";
+            String msg="adfsdsfsdf";
             Map params = session.getParameters();
             Log.e("afas",params.toString());
             if (params.containsKey("ip")){
-
+                ArrayList list = (ArrayList) params.get("ip");
+                sendMessageToActivity((String) list.get(0));
+                return newFixedLengthResponse(msg);
             }
             if (params.containsKey("q")){
                 ArrayList list = (ArrayList) params.get("q");
