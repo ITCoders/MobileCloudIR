@@ -41,6 +41,7 @@ def data_distribute(request):
     ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', None))
     print(ip)
     data_points = DataRepository.objects.filter(ip=None)
+    data_point_ip = DataRepository.objects.filter(ip=ip)
     if len(data_points) > 0:
         data_points[0].ip = ip
         data_points[0].save()
@@ -49,6 +50,9 @@ def data_distribute(request):
         response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(
             os.path.basename(data_points[0].data_path))
         return response
+    elif len(data_point_ip) == 1:
+        pass
+
 
 def run_multicast_listener(request):
     subprocess.Popen(["python3", os.path.join(settings.BASE_DIR, 'server/reciever.py')])
