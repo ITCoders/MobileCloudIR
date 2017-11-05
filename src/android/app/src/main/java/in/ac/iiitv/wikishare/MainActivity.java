@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     Button btn_query_result;
     EditText query;
+    String baseURL;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,14 +63,14 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         mResponse = (TextView) findViewById(R.id.response);
         btn_query_result=(Button)findViewById(R.id.query_result);
-        mServerAddress = (EditText) findViewById(R.id.serveripaddr);
+//        mServerAddress = (EditText) findViewById(R.id.serveripaddr);
         Intent serviceIntent = new Intent(this,WikiFilesServer.class);
         this.startService(serviceIntent);
         BroadcastReceiver mIpAddressReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String ipaddr = intent.getStringExtra("ipaddr");
-                String baseURL = "http://"+ipaddr+":8000";
+                baseURL = "http://"+ipaddr+":8000";
                 requestServer(baseURL);
             }
         };
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String query1=query.getText().toString();
-                send_query_to_server(query1);
+                send_query_to_server(query1,baseURL);
             }
         });
 
@@ -97,23 +98,34 @@ public class MainActivity extends AppCompatActivity {
     private void findServerAndConnect(String formatedIpAddress) {
         try{
             InetAddress group = InetAddress.getByName("224.1.1.1");
-            MulticastSocket s = new MulticastSocket(9000);
+            final MulticastSocket s = new MulticastSocket(9000);
             s.joinGroup(group);
-            DatagramPacket hi = new DatagramPacket(formatedIpAddress.getBytes(), formatedIpAddress.length(),
+            final DatagramPacket hi = new DatagramPacket(formatedIpAddress.getBytes(), formatedIpAddress.length(),
                     group, 9000);
-            s.send(hi);}
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        s.send(hi);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            t.start();
+        }
         catch (IOException e){
             e.printStackTrace();
         }
     }
 
 
-    public void send_query_to_server(final String query){
+    public void send_query_to_server(final String query,String baseURL){
         final RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "http://"+mServerAddress.getText().toString();
-
+        mResponse.setText("");
         //progressDialog.show();
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url+"/query", new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, baseURL+"/query", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Log.e("response", s);
@@ -192,8 +204,7 @@ public class MainActivity extends AppCompatActivity {
                                         FileInputStream is = new FileInputStream(downloadedFile);
                                         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                                         String line = reader.readLine();
-                                        while (line != null) {
-                                            Log.d("StackOverflow", line);
+                                        while (!line.isEmpty() ) {
                                             documents.add(new JSONObject(line));
                                             line = reader.readLine();
                                         }
@@ -264,8 +275,6 @@ public class MainActivity extends AppCompatActivity {
         queue.add(new StringRequest(Request.Method.GET, url+"/ping", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-//                hello.setText(response);
-                Log.e("asfas",response);
                 sharedPref = context.getSharedPreferences(
                         "preference_file", Context.MODE_PRIVATE);
                 boolean dataLoaded = sharedPref.getBoolean("IsDataLoaded", false);

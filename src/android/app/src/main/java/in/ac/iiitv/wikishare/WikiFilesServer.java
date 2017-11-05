@@ -52,7 +52,7 @@ public class WikiFilesServer extends Service {
         public Response serve(IHTTPSession session) {
             String msg="adfsdsfsdf";
             Map params = session.getParameters();
-            Log.e("afas",params.toString());
+            Log.e("params",params.toString());
             if (params.containsKey("ip")){
                 ArrayList list = (ArrayList) params.get("ip");
                 sendMessageToActivity((String) list.get(0));
@@ -75,10 +75,14 @@ public class WikiFilesServer extends Service {
                 for (String word:query.split(" ")
                      ) {
                     word = word.toLowerCase();
-                    JSONArray array = jsonObject.getJSONArray(word);
+                    JSONArray array = jsonObject.optJSONArray(word);
                     int sum = 0;
+                    if (array == null){
+                        sum = 0;
+                    }else {
                     for (int i=0; i<array.length();i++){
                         sum += array.getJSONObject(i).getInt("value");
+                    }
                     }
                     Log.e("sum",sum+"");
 //                    msg = sum+"";
@@ -86,9 +90,10 @@ public class WikiFilesServer extends Service {
                 }
                 }catch (Exception e){
                     e.printStackTrace();
+                    msg = "{\"sum\":"+0+"}";
+
                 }
             }
-            Log.e("i listened",params.toString());
 //            String msg = "<html><body><h1>Hello server</h1>\n";
 //            Map<String, String> parms = session.getParms();
 //            if (parms.get("username") == null) {
