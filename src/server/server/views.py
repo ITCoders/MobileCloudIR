@@ -9,7 +9,8 @@ import subprocess
 from .models import OnlineDevices, DataRepository
 from CentralServer import settings
 from django.views.decorators.csrf import csrf_exempt
-
+from .tasks import app
+from uuid import uuid4
 
 def ping(request):
     ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', None))
@@ -61,14 +62,23 @@ def run_multicast_listener(request):
 @csrf_exempt
 def query(request):
     if request.method == "POST":
-        print(request.POST.get('query'))
-        res = []
-        for od in OnlineDevices.objects.all():
-            try:
-                r = requests.get("http://" + od.ip + ":8056/" + "?q=" + request.POST.get('query'))
-                print(r.text)
-                res.append({'ip': od.ip, 'sum': json.loads(r.text)['sum']})
-            except Exception as e:
-                print("error: ", e)
-        print(res)
+        # print(request.POST.get('query'))
+        # print(request.POST.get('ip'))
+        # res = []
+        # for od in OnlineDevices.objects.all():
+        #     try:
+        #         r = requests.get("http://" + od.ip + ":8056/" + "?q=" + request.POST.get('query'))
+        #         print(r.text)
+        #         res.append({'ip': od.ip, 'sum': json.loads(r.text)['sum']})
+        #     except Exception as e:
+        #         print("error: ", e)
+        # print(res)
+        tid = str(uuid4())
+        res = json.dumps({'tid': tid})
+        app.send_task('server.tasks.query', args=(request.POST.get('query'), request.POST.get('ip'), tid))
         return HttpResponse(json.dumps(res))
+
+@csrf_exempt
+def test(request):
+    app.send_task('tasks.debug_task')
+    return HttpResponse("OK")
